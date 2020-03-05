@@ -21,7 +21,7 @@ public class DayController {
     Dayservice dayservice=new Dayservice();
 
 
-    @LoginRequired
+
     @ApiOperation("获取该日预约信息")
     @GetMapping("/getDay")
     public Day getDay(String dayid) {
@@ -29,7 +29,7 @@ public class DayController {
         return dayservice.getDay(dayid);
     }
 
-    @LoginRequired
+
     @ApiOperation("获取从该日起三天的预约信息")
     @GetMapping("/getThreeDays")
     public List<Day> getThreeDays(String dayid) {
@@ -44,7 +44,7 @@ public class DayController {
         return dayservice.createDay(dayid);
     }*/
 
-    @LoginRequired
+
     @ApiOperation("更新该日预约信息,不更新的值不用写")
     @PostMapping(value="updateDay")
     public String updateDay(@RequestBody Day day) {

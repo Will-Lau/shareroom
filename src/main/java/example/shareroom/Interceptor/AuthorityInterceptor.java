@@ -43,7 +43,7 @@ public class AuthorityInterceptor implements HandlerInterceptor{
                 }
             }*/
             //判断session_id是否有效
-            String s=request.getParameter("token");
+            String s=request.getParameter("userId");
 
             if(s==null||s.equals("")) return false;
             String openid=stringRedisTemplate.opsForValue().get(s);
