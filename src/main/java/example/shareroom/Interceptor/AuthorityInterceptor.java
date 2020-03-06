@@ -9,7 +9,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class AuthorityInterceptor implements HandlerInterceptor{
 
@@ -43,8 +47,15 @@ public class AuthorityInterceptor implements HandlerInterceptor{
                 }
             }*/
             //判断session_id是否有效
-            String s=request.getParameter("userId");
-
+            String s;
+            if ("POST".equalsIgnoreCase(request.getMethod()))
+            {
+                s=request.getHeader("userId");
+            }
+            else {
+                s=request.getParameter("userId");
+            }
+            System.out.println(s);
             if(s==null||s.equals("")) return false;
             String openid=stringRedisTemplate.opsForValue().get(s);
             System.out.println(openid);
@@ -58,6 +69,21 @@ public class AuthorityInterceptor implements HandlerInterceptor{
         }
         //否则直接过
         return true;
+    }
+
+
+    public String getUserIdInPost(String text){
+
+        String matchword="\"userId\"\\s*:\\s*\".*\"";
+        Pattern pattern=Pattern.compile(matchword);
+        Matcher matcher=pattern.matcher(text);
+        if(matcher.find()){
+            //System.out.println(matcher.group(0));
+            String s1=matcher.group(0);
+            return s1.substring(11,s1.length()-1);
+            //System.out.println(s);
+        }
+        else return null;
     }
 
 }

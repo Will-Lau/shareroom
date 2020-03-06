@@ -35,16 +35,16 @@ public class CreditController {
     @LoginRequired
     @ApiOperation("创建Credit")
     @PostMapping("/createCredit")
-    public String createBody(@RequestBody Credit credit) {
-        credit.setUserId(method.getUseridByToken(credit.getUserId()));
+    public String createBody(@RequestHeader String userId,@RequestBody Credit credit) {
+        credit.setUserId(method.getUseridByToken(userId));
         return creditservice.createCredit(credit);
     }
 
     @LoginRequired
     @ApiOperation("更新Credit,不更新的值不用写")
     @PostMapping("/updateCredit")
-    public String updateCredit(@RequestBody Credit credit) {
-        credit.setUserId(method.getUseridByToken(credit.getUserId()));
+    public String updateCredit(@RequestHeader String userId,@RequestBody Credit credit) {
+        credit.setUserId(method.getUseridByToken(userId));
         return creditservice.updateCredit(credit);
         
     }

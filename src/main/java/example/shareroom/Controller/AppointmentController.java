@@ -45,15 +45,16 @@ public class AppointmentController {
     @LoginRequired
     @ApiOperation("创建Appointment")
     @PostMapping("/createAppointment")
-    public String createAppointment(@RequestBody Appointment appointment) throws ParseException {
-        appointment.setUserId(method.getUseridByToken(appointment.getUserId()));
+    public String createAppointment(@RequestHeader String userId, @RequestBody Appointment appointment) throws ParseException {
+        appointment.setUserId(method.getUseridByToken(userId));
         return appointmentservice.createAppointment(appointment);
     }
+
     @LoginRequired
     @ApiOperation("更新Appointment")
     @PostMapping("/updateAppointment")
-    public String updateAppointment(@RequestBody Appointment appointment) {
-        appointment.setUserId(method.getUseridByToken(appointment.getUserId()));
+    public String updateAppointment(@RequestHeader String userId,@RequestBody Appointment appointment) {
+        appointment.setUserId(method.getUseridByToken(userId));
         return appointmentservice.updateAppointment(appointment);
         
     }

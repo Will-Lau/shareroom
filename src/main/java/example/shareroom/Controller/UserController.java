@@ -46,8 +46,8 @@ public class UserController {
     @LoginRequired
     @ApiOperation("更新用户信息")
     @PostMapping("/updateUser")
-    public String updateUser(@RequestBody User user) {
-        user.setUserId(method.getUseridByToken(user.getUserId()));
+    public String updateUser(@RequestHeader String userId,@RequestBody User user) {
+        user.setUserId(method.getUseridByToken(userId));
         return userservice.updateUsers(user);
     }
 
