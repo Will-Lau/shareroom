@@ -17,11 +17,11 @@ import java.util.List;
 
 @Api(value = "预约管理", tags="Appointment")
 @RestController
-@RequestMapping("/body/*")
+@RequestMapping("/appointment/*")
 public class AppointmentController {
 
     @Autowired
-    Appointmentservice appointmentservice=new Appointmentservice();
+    Appointmentservice appointmentservice;
 
     @Autowired
     Method method;
@@ -35,12 +35,12 @@ public class AppointmentController {
     }
 
 
-    @ApiOperation("获取上一个完成的记录")
+/*    @ApiOperation("获取上一个完成的记录")
     @GetMapping("getlastAppointment/")
     public Appointment getlastAppointment() {
         
         return appointmentservice.getlastAppointment();
-    }
+    }*/
 
     @LoginRequired
     @ApiOperation("创建Appointment")
@@ -71,6 +71,14 @@ public class AppointmentController {
     public String dropAppointment(String aid) {
         return appointmentservice.setAppointmentcancel(aid);
         
+    }
+
+
+    @ApiOperation("结束Appointment")//todo:改成判断而不是同意，并返回相应的key
+    @GetMapping("/finishAppointment")
+    public String finishAppointment(String aid) {
+        return appointmentservice.finishAppointment(aid);
+
     }
 
     @ApiOperation(value="获取给定时间之后的Appointment",notes = "这里的date形式为 yyyy-mm-dd hh:mm:ss")

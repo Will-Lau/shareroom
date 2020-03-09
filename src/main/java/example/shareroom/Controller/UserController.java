@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 
@@ -51,12 +52,12 @@ public class UserController {
         return userservice.updateUsers(user);
     }
 
-    @LoginRequired
-    @ApiOperation("给上一个用户打分，这里userId填自己的不是上一个用户")
+    //@LoginRequired
+    @ApiOperation("给上一个预约的用户打分，aId填当前预约。")
     @GetMapping("/markLastuser")
-    public String markLastUser(String userId,double mark) {
+    public String markLastUser(String aId,double mark) throws ParseException {
         //userId=method.getUseridByToken(userId);
-        return userservice.updateusermark(userId,mark);
+        return userservice.updateusermark(aId,mark);
     }
 
 

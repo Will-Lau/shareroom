@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -61,11 +62,13 @@ public class Method {
     }
 
     public boolean Isconflict(String timeString,String busytime){
-        String st1=timeString.replaceAll(",","");
-        String st2=busytime.replaceAll(",","");
-        for(int i=0;i<st1.length();i++){
-            for(int j=0;j<st2.length();j++){
-                if(st1.charAt(i)==st2.charAt(j)) return true;
+        String[] st1=timeString.split(",");
+        String[] st2=busytime.split(",");
+        //String st1=timeString.replaceAll(",","");
+        //String st2=busytime.replaceAll(",","");
+        for(int i=0;i<st1.length;i++){
+            for(int j=0;j<st2.length;j++){
+                if(st1[i].equals(st2[j])) return true;
             }
         }
         return false;

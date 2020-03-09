@@ -2,7 +2,9 @@ package example.shareroom.service;
 
 
 
+
 import example.shareroom.Entity.Appointment;
+import example.shareroom.Entity.AppointmentExample;
 import example.shareroom.Entity.User;
 import example.shareroom.Entity.UserExample;
 import example.shareroom.Request.GetUsersRule;
@@ -11,6 +13,7 @@ import example.shareroom.Response.UserResponse;
 import example.shareroom.Response.UserTokenResponse;
 import example.shareroom.UsefulUtils.AesEncryptUtils;
 import example.shareroom.UsefulUtils.WxMappingJackson2HttpMessageConverter;
+import example.shareroom.dao.AppointmentMapper;
 import example.shareroom.dao.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -21,10 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 ;import javax.annotation.Resource;
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static example.shareroom.UsefulUtils.DozerUtils.mapList;
 
@@ -35,7 +39,21 @@ public class Userservice {
     UserMapper userMapper;
 
     @Autowired
+    AppointmentMapper appointmentMapper;
+
+    @Autowired
     private RestTemplate restTemplate;
+
+    private static ExecutorService executor= Executors.newSingleThreadExecutor();
+
+    private Thread thread= new Thread(new Runnable() {
+        @Override
+        public void run() {
+            appointmentservice.checkIsFinish();
+        }
+    });
+
+    private int IsRun=0;
 
     @Autowired
     private Appointmentservice appointmentservice;
@@ -57,6 +75,9 @@ public class Userservice {
 
     //使用code换取token，如果是第一次登录就新建用户
     public UserTokenResponse login(String code) throws Exception {
+
+        if(IsRun==0) {thread.start();IsRun=1;}
+
 
         //为restTemplate增添对于不同返回值的错误处理
         restTemplate = new RestTemplate();
@@ -135,11 +156,14 @@ public class Userservice {
     }
 
 
-    public String updateusermark(String userid, double mark){
-        Appointment appointment=appointmentservice.getLastAgreeAppointment(userid);
-        if(appointment==null) return  "该用户还没有预约记录";
-        Appointment lastA=appointmentservice.getLastFinishedAppointment(appointment);
-        if(lastA==null) return "用户是当天首个预约者";
+    public String updateusermark(String aId, double mark) throws ParseException {
+        Appointment appointment=appointmentMapper.selectByPrimaryKey(aId);
+        if(appointment==null) return "该预约不存在";
+        if(appointment.getState().equals("request")) return "该订单无效";
+        if(appointment.getState().equals("cancel")) return "该订单已经取消";
+        String markAid=appointmentservice.getLastFinishedAppointment(appointment);
+        Appointment lastA=appointmentMapper.selectByPrimaryKey(markAid);
+        if(lastA==null) return "该预约的上一个预约不存在";
 
 
         User temp=userMapper.selectByPrimaryKey(lastA.getUserId());
@@ -148,13 +172,14 @@ public class Userservice {
         {
             double oldmark=temp.getMark();
             double oldusetime=temp.getUsetime();
-            double newmark=((oldmark*oldusetime)+mark)/(oldusetime+1);
+            //double newmark=((oldmark*oldusetime)+mark)/(oldusetime+1);
+            double newmark=oldmark+mark;
             temp.setMark(newmark);
             temp.setUsetime(oldusetime+1);
             userMapper.updateByPrimaryKeySelective(temp);
-            return "评价成功";
+            return temp.getUserId();
         }
-        else return "上一个预约用户不存在";
+        else return "上一个预约的用户不存在";
 
     }
 
